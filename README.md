@@ -5,6 +5,6 @@
 ### FPGA
 
 ### Manipulator
-2-axis manipulator\n
-ROS\n
+2-axis manipulator<br/>
+ROS<br/>
 Dynamixel
