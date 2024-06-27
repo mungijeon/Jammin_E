@@ -1,0 +1,9 @@
+<launch>
+<!-- <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch" /> -->
+  <!-- <node name="position_callback_node" pkg="radar_unit" type="position_callback_node" output="screen" /> -->
+
+  <include file="$(find dynamixel_workbench_controllers)/launch/dynamixel_controllers.launch" />
+
+  <node name="radar_unit_node" pkg="radar_unit" type="radar_unit_node" output="screen">
+  </node>
+</launch>
