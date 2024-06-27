@@ -1,82 +1,82 @@
 #include "ros/ros.h"
-#include "dynamixel_workbench_msgs/DynamixelStateList.h"
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
-#include <csignal>
+// dynamixel_workbench_msgs::DynamixelStateList 메세지 타입을 사용하기 위함
+// 이는 다이나믹셀 상태 정보를 포함
+#include "dynamixel_workbench_msgs/DynamixelStateList.h"
 
 class DynamixelControl
 {
 public:
-  int motor_id = 2;
-  int motor_velocity = 10;
-  int direction = 1;
-
   DynamixelControl()
   {
-    client = nh.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    sub = nh.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
-    ros::Duration(1.0).sleep();
-    setVelocity(motor_id, direction * motor_velocity);
+    // 서비스 클라이언트 생성: dynamixel_command 서비스를 호출하기 위한 클라이언트를 생성
+    client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
+    // 구독자 생성: dynamixel_state 토픽을 구독하고, 콜백 함수를 설정
+    sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
+
+    ros::Duration(0.5).sleep();
+    setSpeed(1,40);
+    setSpeed(2,300);
+    setPosition(1, 1000);
+    setPosition(2, 0);
   }
 
-  void setVelocity(int id, int velocity)
-  {
-    dynamixel_workbench_msgs::DynamixelCommand srv;
-    srv.request.command = "";
-    srv.request.id = id;
-    srv.request.addr_name = "Goal_Velocity";
-    srv.request.value = velocity;
-
-    client.call(srv);
-  }
-
+  // 콜백 함수 정의: dynamixel_state 메세지를 처리
   void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
   {
+    // dynamixel_state 리스트 내의 각 상태 메세지를 반복 처리
     for (const auto& state : msg->dynamixel_state)
     {
-      if (state.id == motor_id)
+      if (state.id == 1)
       {
-        ROS_INFO("ID: %d, Position: %d", state.id, state.present_position);
-        if (state.present_position == 0 || state.present_position == 1800)
+        int current_position = state.present_position;
+        ROS_INFO("Current Position of ID %d: %d", state.id, current_position);
+        if (current_position <= 1024)
         {
-          ros::Duration(1.0).sleep();
-          direction *= -1;
-          setVelocity(motor_id, direction * motor_velocity);
-          ROS_INFO("Direction changed: %d", direction);
+          setPosition(1, 3100);
+          setPosition(2,1024);
+        }
+        else if (current_position >= 3072)
+        {
+          setPosition(1,10);
+          setPosition(2,0);
         }
       }
     }
   }
 
-  void stopMotor()
+  void setPosition(int id, int position)
   {
-    setVelocity(motor_id, 0);
+    dynamixel_workbench_msgs::DynamixelCommand srv;
+    srv.request.command = "";
+    srv.request.id = id;
+    srv.request.addr_name = "Goal_Position";
+    srv.request.value = position;
+
+    client.call(srv);
+  }
+
+  void setSpeed(int id, int speed)
+  {
+    dynamixel_workbench_msgs::DynamixelCommand srv;
+    srv.request.command = "";
+    srv.request.id = id;
+    srv.request.addr_name = "Profile_Velocity";
+    srv.request.value = speed;
+
+    client.call(srv);
   }
 
 private:
-  ros::NodeHandle nh;
+  ros::NodeHandle nh_;
   ros::ServiceClient client;
   ros::Subscriber sub;
 };
 
-// 전역 객체로 관리
-DynamixelControl* radar_unit_ptr;
-
-void shutdownCallback(int sig)
-{
-  radar_unit_ptr->stopMotor();
-  ros::shutdown();
-}
-
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "radar_unit_node", ros::init_options::NoSigintHandler);
-
-  DynamixelControl radar_unit;
-  radar_unit_ptr = &radar_unit;
-
-  signal(SIGINT, shutdownCallback);
-
+  ros::init(argc, argv, "jammer_unit_node");
+  DynamixelControl jammer_unit;
   ros::spin();
-
   return 0;
 }

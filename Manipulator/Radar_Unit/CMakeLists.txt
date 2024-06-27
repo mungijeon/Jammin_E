@@ -15,12 +15,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(position_callback_node src/position_callback_node.cpp)
-
-target_link_libraries(position_callback_node
-  ${catkin_LIBRARIES}
-)
-
 add_executable(radar_unit_node src/radar_unit_node.cpp)
 
 target_link_libraries(radar_unit_node
