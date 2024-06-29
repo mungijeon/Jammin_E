@@ -6,6 +6,7 @@
 #include "std_msgs/Int32.h"
 // DynamixelCommand를 사용하기 위함
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
+#include "dynamixel_workbench_msgs/DynamixelStateList.h"
 
 // DynamixelControl 클래스 선언
 class DynamixelControl
@@ -16,12 +17,30 @@ public:
   DynamixelControl()
   {
     // 서비스 클라이언트 초기화: /dynamixel_workbench/dynamixel_command 서비스와 통신
-    client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
+    client = nh.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
     // 구독자 초기화: dynamixel_positions 토픽을 구독하고 콜백 함수 설정
-    sub_theta1 = nh_.subscribe("position_1", 10, &DynamixelControl::commandCallback1, this);
-    sub_theta2 = nh_.subscribe("position_2", 10, &DynamixelControl::commandCallback2, this);
-    //sub_theta1 = nh_.subscribe("topic_theta1", 10, &DynamixelControl::commandCallback1, this);
-    //sub_theta2 = nh_.subscribe("topic_theta2", 10, &DynamixelControl::commandCallback2, this);
+    sub = nh.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
+    sub_theta1 = nh.subscribe("/position_1", 10, &DynamixelControl::commandCallback1, this);
+    sub_theta2 = nh.subscribe("/position_2", 10, &DynamixelControl::commandCallback2, this);
+    //sub_theta1 = nh.subscribe("/topic_theta1", 10, &DynamixelControl::commandCallback1, this);
+    //sub_theta2 = nh.subscribe("/topic_theta2", 10, &DynamixelControl::commandCallback2, this);
+  }
+
+  void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
+  {
+    for (const auto& state : msg->dynamixel_state)
+    {
+      if (state.id == 3)
+        {
+          current_position3 = state.present_position;
+          ROS_INFO("Current Position of ID %d: %d", state.id, current_position3);
+        }
+      else if (state.id == 4)
+        {
+          current_position4 = state.present_position;
+          ROS_INFO("Current Position of ID %d: %d", state.id, current_position4);
+        }
+    }
   }
 
   // 콜백 함수: dynamixel_positions 토픽에서 메시지를 받을 때 호출
@@ -56,12 +75,16 @@ public:
 // 일반적으로 멤버 변수는 비공개로 하고, 멤버 함수는 공개하는 것이 일반적이다.
 private:
   // ROS 노드 핸들러
-  ros::NodeHandle nh_;
+  ros::NodeHandle nh;
   // 서비스 클라이언트
   ros::ServiceClient client;
   // 구독자
+  ros::Subscriber sub;
   ros::Subscriber sub_theta1;
   ros::Subscriber sub_theta2;
+
+  int current_position3 = 0;
+  int current_position4 = 0;
 };
 
 // 메인 함수
