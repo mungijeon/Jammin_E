@@ -1,30 +1,28 @@
-// ROSÀÇ ÇÙ½É ±â´ÉÀ» »ç¿ëÇÏ±â À§ÇØ ÇÊ¿ä
+// ROSì˜ í•µì‹¬ ê¸°ëŠ¥ì„ ì‚¬ìš©í•˜ê¸° ìœ„í•´ í•„ìš”
 #include "ros/ros.h"
-// ROS Ç¥ÁØ ¸Þ½ÃÁö Å¸ÀÔÀÎ 'std_msgs' ÆÐÅ°Áö¿¡¼­ 'Int32MultiArray' ¸Þ½ÃÁö Å¸ÀÔÀ» Æ÷ÇÔ½ÃÅ°±â À§ÇÑ Çì´õ ÆÄÀÏÀ» Æ÷ÇÔ
-// 'Int32MultiArrayLayout'´Â ¿©·¯ °³ÀÇ 32ºñÆ® Á¤¼ö('int32')¸¦ ¹è¿­ ÇüÅÂ·Î Æ÷ÇÔÇÏ´Â ¸Þ½ÃÁö Å¸ÀÔÀÌ´Ù.
-// ¿©·¯ °³ÀÇ 32ºñÆ® Á¤¼ö¸¦ ¹è¿­ ÇüÅÂ·Î Àü´ÞÇÏ´Â µ¥ »ç¿ë
+// ROS í‘œì¤€ ë©”ì‹œì§€ íƒ€ìž…ì¸ 'std_msgs' íŒ¨í‚¤ì§€ì—ì„œ 'Int32MultiArray' ë©”ì‹œì§€ íƒ€ìž…ì„ í¬í•¨ì‹œí‚¤ê¸° ìœ„í•œ í—¤ë” íŒŒì¼ì„ í¬í•¨
+// 'Int32MultiArrayLayout'ëŠ” ì—¬ëŸ¬ ê°œì˜ 32ë¹„íŠ¸ ì •ìˆ˜('int32')ë¥¼ ë°°ì—´ í˜•íƒœë¡œ í¬í•¨í•˜ëŠ” ë©”ì‹œì§€ íƒ€ìž…ì´ë‹¤.
+// ì—¬ëŸ¬ ê°œì˜ 32ë¹„íŠ¸ ì •ìˆ˜ë¥¼ ë°°ì—´ í˜•íƒœë¡œ ì „ë‹¬í•˜ëŠ” ë° ì‚¬ìš©
 #include "std_msgs/Int32.h"
-// DynamixelCommand¸¦ »ç¿ëÇÏ±â À§ÇÔ
+// DynamixelCommandë¥¼ ì‚¬ìš©í•˜ê¸° ìœ„í•¨
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
 
-// DynamixelControl Å¬·¡½º ¼±¾ð
+// DynamixelControl í´ëž˜ìŠ¤ ì„ ì–¸
 class DynamixelControl
 {
-// public ¸â¹ö´Â ±¸Á¶Ã¼ ¶Ç´Â Å¬·¡½º ¿ÜºÎ¿¡¼­ Á¢±ÙÇÒ ¼ö ÀÖ´Â ±¸Á¶Ã¼ ¶Ç´Â Å¬·¡½ºÀÇ °ø°³ ¸â¹ö´Ù.
+// public ë©¤ë²„ëŠ” êµ¬ì¡°ì²´ ë˜ëŠ” í´ëž˜ìŠ¤ ì™¸ë¶€ì—ì„œ ì ‘ê·¼í•  ìˆ˜ ìžˆëŠ” êµ¬ì¡°ì²´ ë˜ëŠ” í´ëž˜ìŠ¤ì˜ ê³µê°œ ë©¤ë²„ë‹¤.
 public:
-  // »ý¼ºÀÚ: ÃÊ±âÈ­ ¹× ROS ¼­ºñ½º Å¬¶óÀÌ¾ðÆ®¿Í ±¸µ¶ÀÚ¸¦ ¼³Á¤
+  // ìƒì„±ìž: ì´ˆê¸°í™” ë° ROS ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸ì™€ êµ¬ë…ìžë¥¼ ì„¤ì •
   DynamixelControl()
   {
-    // ¼­ºñ½º Å¬¶óÀÌ¾ðÆ® ÃÊ±âÈ­: /dynamixel_workbench/dynamixel_command ¼­ºñ½º¿Í Åë½Å
+    // ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸ ì´ˆê¸°í™”: /dynamixel_workbench/dynamixel_command ì„œë¹„ìŠ¤ì™€ í†µì‹ 
     client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    // ±¸µ¶ÀÚ ÃÊ±âÈ­: dynamixel_positions ÅäÇÈÀ» ±¸µ¶ÇÏ°í ÄÝ¹é ÇÔ¼ö ¼³Á¤
-    //sub_theta1 = nh_.subscribe("position_1", 10, &DynamixelControl::commandCallback1, this);
-    //sub_theta2 = nh_.subscribe("position_2", 10, &DynamixelControl::commandCallback2, this);
-    sub_theta1 = nh_.subscribe("topic_theta1", 10, &DynamixelControl::commandCallback1, this);
-    sub_theta2 = nh_.subscribe("topic_theta2", 10, &DynamixelControl::commandCallback2, this);
+    // êµ¬ë…ìž ì´ˆê¸°í™”: dynamixel_positions í† í”½ì„ êµ¬ë…í•˜ê³  ì½œë°± í•¨ìˆ˜ ì„¤ì •
+    sub_theta1 = nh_.subscribe("position_1", 10, &DynamixelControl::commandCallback1, this);
+    sub_theta2 = nh_.subscribe("position_2", 10, &DynamixelControl::commandCallback2, this);
   }
 
-  // ÄÝ¹é ÇÔ¼ö: dynamixel_positions ÅäÇÈ¿¡¼­ ¸Þ½ÃÁö¸¦ ¹ÞÀ» ¶§ È£Ãâ
+  // ì½œë°± í•¨ìˆ˜: dynamixel_positions í† í”½ì—ì„œ ë©”ì‹œì§€ë¥¼ ë°›ì„ ë•Œ í˜¸ì¶œ
   void commandCallback1(const std_msgs::Int32::ConstPtr& msg)
   {
     setPosition(3, msg->data);
@@ -34,44 +32,44 @@ public:
     setPosition(4, msg->data);
   }
   
-  // ¸ðÅÍ À§Ä¡ ¼³Á¤ ÇÔ¼ö
+  // ëª¨í„° ìœ„ì¹˜ ì„¤ì • í•¨ìˆ˜
   void setPosition(int id, int position)
   {
-    // DynamixelCommand ¼­ºñ½º ¿äÃ» ¸Þ½ÃÁö »ý¼º
+    // DynamixelCommand ì„œë¹„ìŠ¤ ìš”ì²­ ë©”ì‹œì§€ ìƒì„±
     dynamixel_workbench_msgs::DynamixelCommand srv;
-    // ¿äÃ» ¸í·ÉÀ» ºó ¹®ÀÚ¿­·Î ¼³Á¤
+    // ìš”ì²­ ëª…ë ¹ì„ ë¹ˆ ë¬¸ìžì—´ë¡œ ì„¤ì •
     srv.request.command = "";
-    // ¿äÃ» ¸ðÅÍ ID ¼³Á¤
+    // ìš”ì²­ ëª¨í„° ID ì„¤ì •
     srv.request.id = id;
-    // ¿äÃ» ÁÖ¼Ò ÀÌ¸§ ¼³Á¤: Goal_Position (¸ñÇ¥ À§Ä¡)
+    // ìš”ì²­ ì£¼ì†Œ ì´ë¦„ ì„¤ì •: Goal_Position (ëª©í‘œ ìœ„ì¹˜)
     srv.request.addr_name = "Goal_Position";
-    // ¿äÃ» °ª ¼³Á¤: À§Ä¡
+    // ìš”ì²­ ê°’ ì„¤ì •: ìœ„ì¹˜
     srv.request.value = position;
 
-    // ¼­ºñ½º¸¦ È£ÃâÇÏ¿© ¿äÃ»À» º¸³¿
+    // ì„œë¹„ìŠ¤ë¥¼ í˜¸ì¶œí•˜ì—¬ ìš”ì²­ì„ ë³´ëƒ„
     client.call(srv);
   }
 
-// private ¸â¹ö´Â ¿ÀÁ÷ Å¬·¡½ºÀÇ ´Ù¸¥ ¸â¹ö¸¸ Á¢±ÙÇÒ ¼ö ÀÖ´Â ºñ°ø°³ ¸â¹ö´Ù.
-// ÀÏ¹ÝÀûÀ¸·Î ¸â¹ö º¯¼ö´Â ºñ°ø°³·Î ÇÏ°í, ¸â¹ö ÇÔ¼ö´Â °ø°³ÇÏ´Â °ÍÀÌ ÀÏ¹ÝÀûÀÌ´Ù.
+// private ë©¤ë²„ëŠ” ì˜¤ì§ í´ëž˜ìŠ¤ì˜ ë‹¤ë¥¸ ë©¤ë²„ë§Œ ì ‘ê·¼í•  ìˆ˜ ìžˆëŠ” ë¹„ê³µê°œ ë©¤ë²„ë‹¤.
+// ì¼ë°˜ì ìœ¼ë¡œ ë©¤ë²„ ë³€ìˆ˜ëŠ” ë¹„ê³µê°œë¡œ í•˜ê³ , ë©¤ë²„ í•¨ìˆ˜ëŠ” ê³µê°œí•˜ëŠ” ê²ƒì´ ì¼ë°˜ì ì´ë‹¤.
 private:
-  // ROS ³ëµå ÇÚµé·¯
+  // ROS ë…¸ë“œ í•¸ë“¤ëŸ¬
   ros::NodeHandle nh_;
-  // ¼­ºñ½º Å¬¶óÀÌ¾ðÆ®
+  // ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸
   ros::ServiceClient client;
-  // ±¸µ¶ÀÚ
+  // êµ¬ë…ìž
   ros::Subscriber sub_theta1;
   ros::Subscriber sub_theta2;
 };
 
-// ¸ÞÀÎ ÇÔ¼ö
+// ë©”ì¸ í•¨ìˆ˜
 int main(int argc, char **argv)
 {
-  // ROS ³ëµå ÃÊ±âÈ­
+  // ROS ë…¸ë“œ ì´ˆê¸°í™”
   ros::init(argc, argv, "jammer_unit_node");
-  // DynamixelControl °´Ã¼ »ý¼º
+  // DynamixelControl ê°ì²´ ìƒì„±
   DynamixelControl jammer_unit;
-  // ROS ÀÌº¥Æ® ·çÇÁ ½ÃÀÛ: ÄÝ¹é ÇÔ¼ö°¡ È£ÃâµÉ ¼ö ÀÖµµ·Ï ÇÔ
+  // ROS ì´ë²¤íŠ¸ ë£¨í”„ ì‹œìž‘: ì½œë°± í•¨ìˆ˜ê°€ í˜¸ì¶œë  ìˆ˜ ìžˆë„ë¡ í•¨
   ros::spin();
   return 0;
 }
