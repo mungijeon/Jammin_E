@@ -20,6 +20,8 @@ public:
     // 구독자 초기화: dynamixel_positions 토픽을 구독하고 콜백 함수 설정
     sub_theta1 = nh_.subscribe("position_1", 10, &DynamixelControl::commandCallback1, this);
     sub_theta2 = nh_.subscribe("position_2", 10, &DynamixelControl::commandCallback2, this);
+    //sub_theta1 = nh_.subscribe("topic_theta1", 10, &DynamixelControl::commandCallback1, this);
+    //sub_theta2 = nh_.subscribe("topic_theta2", 10, &DynamixelControl::commandCallback2, this);
   }
 
   // 콜백 함수: dynamixel_positions 토픽에서 메시지를 받을 때 호출
