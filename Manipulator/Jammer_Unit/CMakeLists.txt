@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.0.2)
 ## 프로젝트 이름 설정
 # 해당 이름으로 catkin_ws/devel/lib 경로에 폴더가 생성된다
 # package.xml에서 package 이름과 동일하게 해주어야 한다
+# launch 파일에서 package 이름과 동일하게 해주어야 한다
 project(jammer_unit)
 
 ## 필요한 패키지 찾기

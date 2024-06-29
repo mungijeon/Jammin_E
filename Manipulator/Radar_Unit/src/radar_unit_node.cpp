@@ -1,18 +1,25 @@
 #include "ros/ros.h"
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
-// dynamixel_workbench_msgs::DynamixelStateList ë©”ì„¸ì§€ íƒ€ì…ì„ ì‚¬ìš©í•˜ê¸° ìœ„í•¨
-// ì´ëŠ” ë‹¤ì´ë‚˜ë¯¹ì…€ ìƒíƒœ ì •ë³´ë¥¼ í¬í•¨
+// dynamixel_workbench_msgs::DynamixelStateList ¸Ş¼¼Áö Å¸ÀÔÀ» »ç¿ëÇÏ±â À§ÇÔ
+// ÀÌ´Â ´ÙÀÌ³ª¹Í¼¿ »óÅÂ Á¤º¸¸¦ Æ÷ÇÔ
 #include "dynamixel_workbench_msgs/DynamixelStateList.h"
+#include "std_msgs/Int32.h"       // Á¤¼ö R °ªÀ» À§ÇÑ ¸Ş½ÃÁö Å¸ÀÔ
 
 class DynamixelControl
 {
 public:
   DynamixelControl()
   {
-    // ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸ ìƒì„±: dynamixel_command ì„œë¹„ìŠ¤ë¥¼ í˜¸ì¶œí•˜ê¸° ìœ„í•œ í´ë¼ì´ì–¸íŠ¸ë¥¼ ìƒì„±
+    // ¼­ºñ½º Å¬¶óÀÌ¾ğÆ® »ı¼º: dynamixel_command ¼­ºñ½º¸¦ È£ÃâÇÏ±â À§ÇÑ Å¬¶óÀÌ¾ğÆ®¸¦ »ı¼º
     client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    // êµ¬ë…ì ìƒì„±: dynamixel_state í† í”½ì„ êµ¬ë…í•˜ê³ , ì½œë°± í•¨ìˆ˜ë¥¼ ì„¤ì •
+    // ±¸µ¶ÀÚ »ı¼º: dynamixel_state ÅäÇÈÀ» ±¸µ¶ÇÏ°í, Äİ¹é ÇÔ¼ö¸¦ ¼³Á¤
     sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
+    // topic1À» ÅëÇØ ±¸µ¶
+    sub_r = nh_.subscribe("topic_r", 10, &DynamixelControl::RCallback, this);    
+    // topic2¸¦ ÅëÇØ ¹ßÇà
+    pub_theta1 = nh_.advertise<std_msgs::Int32>("topic_theta1", 10);
+    pub_theta2 = nh_.advertise<std_msgs::Int32>("topic_theta2", 10);
+    pub_r = nh_.advertise<std_msgs::Int32>("topic_R", 10);
 
     ros::Duration(0.5).sleep();
     setSpeed(1,40);
@@ -21,28 +28,56 @@ public:
     setPosition(2, 0);
   }
 
-  // ì½œë°± í•¨ìˆ˜ ì •ì˜: dynamixel_state ë©”ì„¸ì§€ë¥¼ ì²˜ë¦¬
+  // Äİ¹é ÇÔ¼ö Á¤ÀÇ: dynamixel_state ¸Ş¼¼Áö¸¦ Ã³¸®
   void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
   {
-    // dynamixel_state ë¦¬ìŠ¤íŠ¸ ë‚´ì˜ ê° ìƒíƒœ ë©”ì„¸ì§€ë¥¼ ë°˜ë³µ ì²˜ë¦¬
+    // dynamixel_state ¸®½ºÆ® ³»ÀÇ °¢ »óÅÂ ¸Ş¼¼Áö¸¦ ¹İº¹ Ã³¸®
     for (const auto& state : msg->dynamixel_state)
     {
       if (state.id == 1)
       {
-        int current_position = state.present_position;
-        ROS_INFO("Current Position of ID %d: %d", state.id, current_position);
-        if (current_position <= 1024)
+        current_position1 = state.present_position;
+        ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
+        if (current_position1 <= 1024)
         {
           setPosition(1, 3100);
           setPosition(2,1024);
         }
-        else if (current_position >= 3072)
+        else if (current_position1 >= 3072)
         {
           setPosition(1,1000);
           setPosition(2,0);
         }
       }
+      else if (state.id == 2)
+      {
+        current_position2 = state.present_position;
+      }
     }
+  }
+
+  // R °ªÀ» ¹Ş´Â Äİ¹é ÇÔ¼ö
+  void RCallback(const std_msgs::Int32::ConstPtr& msg)
+  {
+    int R = msg->data;
+    ROS_INFO("R: %d", R);
+    ROS_INFO("theta1: %d", current_position1);
+    ROS_INFO("theta2: %d", current_position2);
+
+    // R °ªÀ» ¹ßÇà
+    std_msgs::Int32 r_msg;
+    r_msg.data = R;
+    pub_r.publish(r_msg);
+
+    // ¸ğÅÍ 1 À§Ä¡¸¦ ¹ßÇà
+    std_msgs::Int32 theta1_msg;
+    theta1_msg.data = current_position1;
+    pub_theta1.publish(theta1_msg);
+
+    // ¸ğÅÍ 2 À§Ä¡¸¦ ¹ßÇà
+    std_msgs::Int32 theta2_msg;
+    theta2_msg.data = current_position2;
+    pub_theta2.publish(theta2_msg);
   }
 
   void setPosition(int id, int position)
@@ -71,6 +106,13 @@ private:
   ros::NodeHandle nh_;
   ros::ServiceClient client;
   ros::Subscriber sub;
+  ros::Subscriber sub_r;
+  ros::Publisher pub_theta1;
+  ros::Publisher pub_theta2;
+  ros::Publisher pub_r;
+
+  int current_position1 = 0;
+  int current_position2 = 0;
 };
 
 int main(int argc, char **argv)

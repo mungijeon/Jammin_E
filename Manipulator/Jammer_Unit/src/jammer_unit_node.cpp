@@ -3,7 +3,7 @@
 // ROS 표준 메시지 타입인 'std_msgs' 패키지에서 'Int32MultiArray' 메시지 타입을 포함시키기 위한 헤더 파일을 포함
 // 'Int32MultiArrayLayout'는 여러 개의 32비트 정수('int32')를 배열 형태로 포함하는 메시지 타입이다.
 // 여러 개의 32비트 정수를 배열 형태로 전달하는 데 사용
-#include "std_msgs/Int32MultiArray.h"
+#include "std_msgs/Int32.h"
 // DynamixelCommand를 사용하기 위함
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
 
@@ -16,18 +16,20 @@ public:
   DynamixelControl()
   {
     // 서비스 클라이언트 초기화: /dynamixel_workbench/dynamixel_command 서비스와 통신
-    command_client_ = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
+    client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
     // 구독자 초기화: dynamixel_positions 토픽을 구독하고 콜백 함수 설정
-    sub_ = nh_.subscribe("dynamixel_positions", 10, &DynamixelControl::commandCallback, this);
+    sub_theta1 = nh_.subscribe("position_1", 10, &DynamixelControl::commandCallback1, this);
+    sub_theta2 = nh_.subscribe("position_2", 10, &DynamixelControl::commandCallback2, this);
   }
 
   // 콜백 함수: dynamixel_positions 토픽에서 메시지를 받을 때 호출
-  void commandCallback(const std_msgs::Int32MultiArray::ConstPtr& msg)
+  void commandCallback1(const std_msgs::Int32::ConstPtr& msg)
   {
-    // 첫 번째 모터의 위치 설정
-    setPosition(1, msg->data[0]);
-    // 두 번째 모터의 위치 설정
-    setPosition(2, msg->data[1]);
+    setPosition(3, msg->data);
+  }
+  void commandCallback2(const std_msgs::Int32::ConstPtr& msg)
+  {
+    setPosition(4, msg->data);
   }
   
   // 모터 위치 설정 함수
@@ -45,7 +47,7 @@ public:
     srv.request.value = position;
 
     // 서비스를 호출하여 요청을 보냄
-    command_client_.call(srv);
+    client.call(srv);
   }
 
 // private 멤버는 오직 클래스의 다른 멤버만 접근할 수 있는 비공개 멤버다.
@@ -54,9 +56,10 @@ private:
   // ROS 노드 핸들러
   ros::NodeHandle nh_;
   // 서비스 클라이언트
-  ros::ServiceClient command_client_;
+  ros::ServiceClient client;
   // 구독자
-  ros::Subscriber sub_;
+  ros::Subscriber sub_theta1;
+  ros::Subscriber sub_theta2;
 };
 
 // 메인 함수
