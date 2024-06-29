@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
-// dynamixel_workbench_msgs::DynamixelStateList ¸Ş¼¼Áö Å¸ÀÔÀ» »ç¿ëÇÏ±â À§ÇÔ
-// ÀÌ´Â ´ÙÀÌ³ª¹Í¼¿ »óÅÂ Á¤º¸¸¦ Æ÷ÇÔ
+// dynamixel_workbench_msgs::DynamixelStateList ë©”ì„¸ì§€ íƒ€ì…ì„ ì‚¬ìš©í•˜ê¸° ìœ„í•¨
+// ì´ëŠ” ë‹¤ì´ë‚˜ë¯¹ì…€ ìƒíƒœ ì •ë³´ë¥¼ í¬í•¨
 #include "dynamixel_workbench_msgs/DynamixelStateList.h"
 
 class DynamixelControl
@@ -9,9 +9,9 @@ class DynamixelControl
 public:
   DynamixelControl()
   {
-    // ¼­ºñ½º Å¬¶óÀÌ¾ğÆ® »ı¼º: dynamixel_command ¼­ºñ½º¸¦ È£ÃâÇÏ±â À§ÇÑ Å¬¶óÀÌ¾ğÆ®¸¦ »ı¼º
+    // ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸ ìƒì„±: dynamixel_command ì„œë¹„ìŠ¤ë¥¼ í˜¸ì¶œí•˜ê¸° ìœ„í•œ í´ë¼ì´ì–¸íŠ¸ë¥¼ ìƒì„±
     client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    // ±¸µ¶ÀÚ »ı¼º: dynamixel_state ÅäÇÈÀ» ±¸µ¶ÇÏ°í, Äİ¹é ÇÔ¼ö¸¦ ¼³Á¤
+    // êµ¬ë…ì ìƒì„±: dynamixel_state í† í”½ì„ êµ¬ë…í•˜ê³ , ì½œë°± í•¨ìˆ˜ë¥¼ ì„¤ì •
     sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
 
     ros::Duration(0.5).sleep();
@@ -21,10 +21,10 @@ public:
     setPosition(2, 0);
   }
 
-  // Äİ¹é ÇÔ¼ö Á¤ÀÇ: dynamixel_state ¸Ş¼¼Áö¸¦ Ã³¸®
+  // ì½œë°± í•¨ìˆ˜ ì •ì˜: dynamixel_state ë©”ì„¸ì§€ë¥¼ ì²˜ë¦¬
   void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
   {
-    // dynamixel_state ¸®½ºÆ® ³»ÀÇ °¢ »óÅÂ ¸Ş¼¼Áö¸¦ ¹İº¹ Ã³¸®
+    // dynamixel_state ë¦¬ìŠ¤íŠ¸ ë‚´ì˜ ê° ìƒíƒœ ë©”ì„¸ì§€ë¥¼ ë°˜ë³µ ì²˜ë¦¬
     for (const auto& state : msg->dynamixel_state)
     {
       if (state.id == 1)
@@ -38,7 +38,7 @@ public:
         }
         else if (current_position >= 3072)
         {
-          setPosition(1,10);
+          setPosition(1,1000);
           setPosition(2,0);
         }
       }
