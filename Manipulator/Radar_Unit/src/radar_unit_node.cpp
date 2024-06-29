@@ -15,11 +15,11 @@ public:
     // 구독자 생성: dynamixel_state 토픽을 구독하고, 콜백 함수를 설정
     sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
     // topic1을 통해 구독
-    sub_r = nh_.subscribe("topic_r", 10, &DynamixelControl::RCallback, this);    
+    sub_r = nh_.subscribe("rf_layer", 10, &DynamixelControl::RCallback, this);    
     // topic2를 통해 발행
     pub_theta1 = nh_.advertise<std_msgs::Int32>("topic_theta1", 10);
     pub_theta2 = nh_.advertise<std_msgs::Int32>("topic_theta2", 10);
-    pub_r = nh_.advertise<std_msgs::Int32>("topic_R", 10);
+    pub_r = nh_.advertise<std_msgs::Int32>("topic_r", 10);
 
     ros::Duration(0.5).sleep();
     setSpeed(1,40);
