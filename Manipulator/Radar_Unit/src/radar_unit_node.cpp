@@ -40,7 +40,7 @@ public:
       if (state.id == 1)
       {
         current_position1 = state.present_position;
-        ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
+        //ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
         if (current_position1 <= 1024)
         {
           setPosition(1, 3100);
