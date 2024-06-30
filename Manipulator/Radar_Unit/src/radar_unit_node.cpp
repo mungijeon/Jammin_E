@@ -25,7 +25,10 @@ public:
     setSpeed(1,40);
     setSpeed(2,300);
     setPosition(1, 1000);
-    setPosition(2, 0);
+    //setPosition(2, 0);
+    //모터 2의 각도를 0, 90도로 설정하면 90도 일때, z축 위에 드론이 존재한다 가정하므로 theta1의 변화가 무의미해진다.
+    //따라서 test하기에 부적절한 수치라 생각해 바꿔주었다.
+    setPosition(2, 341);
   }
 
   // 콜백 함수 정의: dynamixel_state 메세지를 처리
@@ -41,12 +44,14 @@ public:
         if (current_position1 <= 1024)
         {
           setPosition(1, 3100);
-          setPosition(2,1024);
+          //setPosition(2,1024);
+          setPosition(2,682);
         }
         else if (current_position1 >= 3072)
         {
           setPosition(1,1000);
-          setPosition(2,0);
+          //setPosition(2,0);
+          setPosition(2,341);
         }
       }
       else if (state.id == 2)
