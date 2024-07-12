@@ -154,11 +154,11 @@ module SPI_Master
         r_TX_Bit_Count <= 3'b110;
       end
       else if ((r_Leading_Edge & w_CPHA) | (r_Trailing_Edge & ~w_CPHA)) //시뮬레이션에서 모드 3으로 해서 CPHA 계속 1임 
-      //CPHA 1일때는 상승에지일 때, CPHA 0일 때는 하강에지일 때 (CPOL 1일때로 가정하는건가?)
+      //CPHA 1일때는 상승에지일 때, CPHA 0일 때는 하강에지일 때 
       //1비트씩 수신
       begin
         r_TX_Bit_Count <= r_TX_Bit_Count - 1'b1;
-        o_SPI_MOSI     <= r_TX_Byte[r_TX_Bit_Count]; //나머지 7비트 전송 
+        o_SPI_MOSI     <= r_TX_Byte[r_TX_Bit_Count]; 
       end
     end
   end
