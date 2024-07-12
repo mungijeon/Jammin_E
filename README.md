@@ -5,8 +5,7 @@
 ### FPGA
 
 ### Manipulator
-use after catkin_make<br/>
-need DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
+need package DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
 #### <Radar_Unit>
 roslaunch radar_unit radar_control.launch<br/>
 -> velocity(0-32767): 0.229[rev/min] <br/>
