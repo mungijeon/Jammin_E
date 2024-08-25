@@ -7,7 +7,8 @@
 ### Manipulator
 
 #### [Package]
-DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/><br/>
+DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
+Radar_Unit, Jammer_Unit<br/><br/>
 $ cd ~/catkin_ws/src<br/>
 $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench.git<br/>
 $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench-msgs.git<br/>
