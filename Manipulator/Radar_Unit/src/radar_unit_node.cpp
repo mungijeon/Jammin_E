@@ -1,22 +1,22 @@
 #include "ros/ros.h"
 #include "dynamixel_workbench_msgs/DynamixelCommand.h"
-// dynamixel_workbench_msgs::DynamixelStateList ë©”ì„¸ì§€ íƒ€ì…ì„ ì‚¬ìš©í•˜ê¸° ìœ„í•¨
-// ì´ëŠ” ë‹¤ì´ë‚˜ë¯¹ì…€ ìƒíƒœ ì •ë³´ë¥¼ í¬í•¨
+// dynamixel_workbench_msgs::DynamixelStateList ¸Ş¼¼Áö Å¸ÀÔÀ» »ç¿ëÇÏ±â À§ÇÔ
+// ÀÌ´Â ´ÙÀÌ³ª¹Í¼¿ »óÅÂ Á¤º¸¸¦ Æ÷ÇÔ
 #include "dynamixel_workbench_msgs/DynamixelStateList.h"
-#include "std_msgs/Int32.h"       // ì •ìˆ˜ R ê°’ì„ ìœ„í•œ ë©”ì‹œì§€ íƒ€ì…
+#include "std_msgs/Int32.h"       // Á¤¼ö R °ªÀ» À§ÇÑ ¸Ş½ÃÁö Å¸ÀÔ
 
 class DynamixelControl
 {
 public:
   DynamixelControl()
   {
-    // ì„œë¹„ìŠ¤ í´ë¼ì´ì–¸íŠ¸ ìƒì„±: dynamixel_command ì„œë¹„ìŠ¤ë¥¼ í˜¸ì¶œí•˜ê¸° ìœ„í•œ í´ë¼ì´ì–¸íŠ¸ë¥¼ ìƒì„±
+    // ¼­ºñ½º Å¬¶óÀÌ¾ğÆ® »ı¼º: dynamixel_command ¼­ºñ½º¸¦ È£ÃâÇÏ±â À§ÇÑ Å¬¶óÀÌ¾ğÆ®¸¦ »ı¼º
     client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    // êµ¬ë…ì ìƒì„±: dynamixel_state í† í”½ì„ êµ¬ë…í•˜ê³ , ì½œë°± í•¨ìˆ˜ë¥¼ ì„¤ì •
+    // ±¸µ¶ÀÚ »ı¼º: dynamixel_state ÅäÇÈÀ» ±¸µ¶ÇÏ°í, Äİ¹é ÇÔ¼ö¸¦ ¼³Á¤
     sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
-    // topic1ì„ í†µí•´ êµ¬ë…
+    // topic1À» ÅëÇØ ±¸µ¶
     sub_r = nh_.subscribe("/rf_layer", 10, &DynamixelControl::RCallback, this);    
-    // topic2ë¥¼ í†µí•´ ë°œí–‰
+    // topic2¸¦ ÅëÇØ ¹ßÇà
     pub_theta1 = nh_.advertise<std_msgs::Int32>("/topic_theta1", 10);
     pub_theta2 = nh_.advertise<std_msgs::Int32>("/topic_theta2", 10);
     pub_r = nh_.advertise<std_msgs::Int32>("/topic_r", 10);
@@ -25,33 +25,28 @@ public:
     setSpeed(1,40);
     setSpeed(2,300);
     setPosition(1, 1000);
-    //setPosition(2, 0);
-    //ëª¨í„° 2ì˜ ê°ë„ë¥¼ 0, 90ë„ë¡œ ì„¤ì •í•˜ë©´ 90ë„ ì¼ë•Œ, zì¶• ìœ„ì— ë“œë¡ ì´ ì¡´ì¬í•œë‹¤ ê°€ì •í•˜ë¯€ë¡œ theta1ì˜ ë³€í™”ê°€ ë¬´ì˜ë¯¸í•´ì§„ë‹¤.
-    //ë”°ë¼ì„œ testí•˜ê¸°ì— ë¶€ì ì ˆí•œ ìˆ˜ì¹˜ë¼ ìƒê°í•´ ë°”ê¿”ì£¼ì—ˆë‹¤.
-    setPosition(2, 341);
+    setPosition(2, 0);
   }
 
-  // ì½œë°± í•¨ìˆ˜ ì •ì˜: dynamixel_state ë©”ì„¸ì§€ë¥¼ ì²˜ë¦¬
+  // Äİ¹é ÇÔ¼ö Á¤ÀÇ: dynamixel_state ¸Ş¼¼Áö¸¦ Ã³¸®
   void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
   {
-    // dynamixel_state ë¦¬ìŠ¤íŠ¸ ë‚´ì˜ ê° ìƒíƒœ ë©”ì„¸ì§€ë¥¼ ë°˜ë³µ ì²˜ë¦¬
+    // dynamixel_state ¸®½ºÆ® ³»ÀÇ °¢ »óÅÂ ¸Ş¼¼Áö¸¦ ¹İº¹ Ã³¸®
     for (const auto& state : msg->dynamixel_state)
     {
       if (state.id == 1)
       {
         current_position1 = state.present_position;
-        //ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
+        ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
         if (current_position1 <= 1024)
         {
           setPosition(1, 3100);
-          //setPosition(2,1024);
-          setPosition(2,682);
+          setPosition(2,1024);
         }
         else if (current_position1 >= 3072)
         {
           setPosition(1,1000);
-          //setPosition(2,0);
-          setPosition(2,341);
+          setPosition(2,0);
         }
       }
       else if (state.id == 2)
@@ -61,7 +56,7 @@ public:
     }
   }
 
-  // R ê°’ì„ ë°›ëŠ” ì½œë°± í•¨ìˆ˜
+  // R °ªÀ» ¹Ş´Â Äİ¹é ÇÔ¼ö
   void RCallback(const std_msgs::Int32::ConstPtr& msg)
   {
     int R = msg->data;
@@ -69,17 +64,17 @@ public:
     ROS_INFO("theta1: %d", current_position1);
     ROS_INFO("theta2: %d", current_position2);
 
-    // R ê°’ì„ ë°œí–‰
+    // R °ªÀ» ¹ßÇà
     std_msgs::Int32 r_msg;
     r_msg.data = R;
     pub_r.publish(r_msg);
 
-    // ëª¨í„° 1 ìœ„ì¹˜ë¥¼ ë°œí–‰
+    // ¸ğÅÍ 1 À§Ä¡¸¦ ¹ßÇà
     std_msgs::Int32 theta1_msg;
     theta1_msg.data = current_position1;
     pub_theta1.publish(theta1_msg);
 
-    // ëª¨í„° 2 ìœ„ì¹˜ë¥¼ ë°œí–‰
+    // ¸ğÅÍ 2 À§Ä¡¸¦ ¹ßÇà
     std_msgs::Int32 theta2_msg;
     theta2_msg.data = current_position2;
     pub_theta2.publish(theta2_msg);
