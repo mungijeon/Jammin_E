@@ -5,7 +5,7 @@
 ### FPGA
 
 ### Manipulator
-package DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
+need package DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/><br/>
 $ cd ~/catkin_ws/src<br/>
 $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench.git<br/>
 $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench-msgs.git<br/>
