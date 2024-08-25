@@ -5,7 +5,13 @@
 ### FPGA
 
 ### Manipulator
-need package DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
+package DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
+$ cd ~/catkin_ws/src<br/>
+$ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench.git<br/>
+$ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench-msgs.git<br/>
+$ git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git<br/>
+$ cd ~/catkin_ws<br/>
+$ catkin_make<br/>
 #### <Radar_Unit>
 roslaunch radar_unit radar_control.launch<br/>
 -> velocity(0-32767): 0.229[rev/min] <br/>
