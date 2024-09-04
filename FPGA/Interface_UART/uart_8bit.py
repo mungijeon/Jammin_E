@@ -33,7 +33,7 @@ def read_from_serial(ser):
 
                         # 10000개 데이터가 모일 때마다 파일에 저장
                         if data_count >= 10000:
-                            with open(f"data_{file_index}.txt", 'w') as file:
+                            with open(f"signal_data{file_index}.txt", 'w') as file:
                                 file.write("\n".join(bits_to_save))
                             print(f"Saved 10000 bits to data_{file_index}.txt")
                             bits_to_save = []  # 리스트 초기화
