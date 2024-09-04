@@ -53,8 +53,21 @@ function signal_process
     
     %% Load signal_Data
 
-    %Tx_data = load("signal_data1.txt");
-    %Rx_data = load("signal_data2.txt");
+   %{
+    Tx_data = [];
+    Rx_data = [];
+    
+    for i = 1:256
+        filename = sprintf('signal_data%d.txt', i);
+        data = load(filename);
+        
+        if mod(i,2) == 0
+            Tx_data = cat(2, Tx_data, data);
+        else
+            Rx_data = cat(2, Rx_data, data);
+        end
+    end
+    %}
     % beat signal
     %{
     for i=1:length(Tx_data)
