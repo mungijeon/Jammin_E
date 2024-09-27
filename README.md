@@ -29,8 +29,8 @@ rostopic pub /dynamixel_positions std_msgs/Int32MultiArray "data: [ID1 position,
 -> degree(360) = 0.088 * value(0-4095) <br/>
 -> positon(0-4095) = 11.38 * degree(360)<br/>
 
-./matlab
-rosinit(초기세팅)
+### [MATLAB]
+$ matlab
+>> rosinit
 
-simulink -> stoptime= inf 라서 run누르면 계속 돌아감
-코드 안에서 publish해주면 simulink 안에 topic subscribe함
+Simulink -> Run
