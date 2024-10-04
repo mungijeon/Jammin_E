@@ -1,12 +1,9 @@
 function radar_gui
     global range_estimated;
     global coor_value;
-    f2 = figure;
-    f1 = figure;
-    hold on;
+
     
     plot_flag = 0;
-    figure(f1);
     % Create figure, Need to setting
     hFig = figure('Name', 'Radar Simulation', 'NumberTitle', 'off', ...
                   'Color', 'k', 'MenuBar', 'none', 'ToolBar', 'none', ...
@@ -173,11 +170,8 @@ function radar_gui
                     end
                     blinkState = ~blinkState;
                 else
-                    disp(plot_flag)
                     if plot_flag == 1
-                        figure(f2);
                         x = linspace(1, 2048 , 2048 );
-                        figure;
                         plot(x, sig_dB, 'r')
                         xlim([-50 250]);  
                         ylim([6 20]);  
@@ -185,7 +179,6 @@ function radar_gui
                         xlabel('Range Bin');
                         ylabel('Magnitude (dB)');
                         title('FMCW Radar Signal Spectrum');
-                        figure(f1);
                         plot_flag = 0;
                     end
                     set(redDot_c, 'Visible', 'on');
