@@ -13,8 +13,7 @@ $ catkin_make<br/>
 $ sudo apt-get install ros-indigo-rosserial-arduino<br/>
 $ sudo apt-get install ros-indigo-rosserial<br/>
 
-workbench -> config 파일 수정, launch 파일 baud rate 수정
-simulink 에서 topic 이름 지정이 아닌 직접 타이핑 해줌
+workbench -> edit .config & .launch(baud rate)<br/>
 
 #### [Radar_Unit]
 roslaunch radar_unit radar_control.launch<br/>
