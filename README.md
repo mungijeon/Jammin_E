@@ -1,11 +1,5 @@
 # Jamming-Project
 
-### RF Module
-
-### FPGA
-
-### Manipulator
-
 #### [Package]
 DynamixelSDK, dynamixel-workbench, dynamixel-workbench-msgs<br/>
 Radar_Unit, Jammer_Unit<br/><br/>
@@ -32,8 +26,8 @@ rostopic pub /dynamixel_positions std_msgs/Int32MultiArray "data: [ID1 position,
 -> degree(360) = 0.088 * value(0-4095) <br/>
 -> positon(0-4095) = 11.38 * degree(360)<br/>
 
-### [MATLAB]
-$ matlab
->> rosinit
+#### [MATLAB]
+$ matlab<br/>
+> rosinit<br/>
 
-Simulink -> Run
+Simulink -> Run<br/>
