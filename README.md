@@ -27,7 +27,6 @@ rostopic pub /dynamixel_positions std_msgs/Int32MultiArray "data: [ID1 position,
 -> positon(0-4095) = 11.38 * degree(360)<br/>
 
 #### [MATLAB]
-$ matlab<br/>
-> rosinit<br/>
+$ matlab -> rosinit<br/>
 
 Simulink -> Run<br/>
