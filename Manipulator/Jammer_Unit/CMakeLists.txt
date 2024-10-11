@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   dynamixel_workbench_msgs
   roscpp
   std_msgs
+  serial REQUIRED
 )
 
 ## catkin 패키지 설정
@@ -23,6 +24,7 @@ catkin_package(
 ## 헤더 파일 디렉토리 포함
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${serial_INCLUDE_DIRS}
 )
 
 ## C++ 실행 파일 생성
