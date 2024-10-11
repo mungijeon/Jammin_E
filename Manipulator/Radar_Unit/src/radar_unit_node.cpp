@@ -8,13 +8,6 @@ class DynamixelControl
 public:
   DynamixelControl()
   {
-    client = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    sub = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
-    sub_r = nh_.subscribe("/rf_layer", 10, &DynamixelControl::RCallback, this);    
-    pub_theta1 = nh_.advertise<std_msgs::Int32>("/topic_theta1", 10);
-    pub_theta2 = nh_.advertise<std_msgs::Int32>("/topic_theta2", 10);
-    pub_r = nh_.advertise<std_msgs::Int32>("/topic_r", 10);
-
     /*********************************************************************
       TOPIC LIST
 
@@ -24,28 +17,39 @@ public:
       pub theta2 : /topic_theta2    to simulink
       pub r      : /topic_r         to simulink
     *********************************************************************/
-
-    ros::Duration(0.5).sleep();
-    setSpeed(1,40);
-    setSpeed(2,300);
-    setPosition(1, 1000);
-    setPosition(2, 0);
+    client     = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
+    
+    sub        = nh_.subscribe("/dynamixel_workbench/dynamixel_state", 10, &DynamixelControl::Callback, this);
+    sub_r      = nh_.subscribe("/rf_layer", 10, &DynamixelControl::RCallback, this);
+      
+    pub_theta1 = nh_.advertise<std_msgs::Int32>("/topic_theta1", 10);
+    pub_theta2 = nh_.advertise<std_msgs::Int32>("/topic_theta2", 10);
+    pub_r      = nh_.advertise<std_msgs::Int32>("/topic_r", 10);
 
     /*********************************************************************
       INIT VALUE
       
       SPEED
 
-      Motor1(xy) : 40
-      Motor2(z)  : 300
+      Motor1(xy) : 10
+
+      Motor2(z)  : 30
 
       POSITION
 
-      Motor1(xy) : 1000
-      Motor2(z)  : 0
+      Motor1(xy) : 2730
+      Motor2(z)  : 510
     *********************************************************************/
+    ros::Duration(0.5).sleep();
+    
+    setSpeed(1,10);
+    setSpeed(2,30);
+    setPosition(1, 2730);
+    setPosition(2, 510);
   }
 
+
+  /* Callback Function */
   void Callback(const dynamixel_workbench_msgs::DynamixelStateList::ConstPtr& msg)
   {
     for (const auto& state : msg->dynamixel_state)
@@ -53,32 +57,38 @@ public:
       if (state.id == 1)
       {
         current_position1 = state.present_position;
-        ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
-        if (current_position1 <= 1024)
+        //ROS_INFO("Current Position of ID %d: %d", state.id, current_position1);
+        if (current_position1 <= 3700)
         {
-          setPosition(1, 3100);
-          setPosition(2,1024);
+          setPosition(1, 2730);
+          setPosition(2,510);
         }
-        else if (current_position1 >= 3072)
+        else if (current_position1 >= 2800)
         {
-          setPosition(1,1000);
-          setPosition(2,0);
+          setPosition(1,3754);
+          setPosition(2,341);
         }
       }
       else if (state.id == 2)
       {
         current_position2 = state.present_position;
+        //ROS_INFO("Current Position of ID %d: %d", state.id, current_position2);
       }
     }
   }
 
   void RCallback(const std_msgs::Int32::ConstPtr& msg)
   {
+    ROS_INFO("#################################");
+    ROS_INFO("#######                   #######");
+    ROS_INFO("#######  Detected Target  #######");
+    ROS_INFO("#######                   #######");
+    ROS_INFO("#################################");
+    //ROS_INFO("R: %d", R);
+    //ROS_INFO("theta1: %d", current_position1);
+    //ROS_INFO("theta2: %d", current_position2);
+    
     int R = msg->data;
-    ROS_INFO("R: %d", R);
-    ROS_INFO("theta1: %d", current_position1);
-    ROS_INFO("theta2: %d", current_position2);
-
     std_msgs::Int32 r_msg;
     r_msg.data = R;
     pub_r.publish(r_msg);
@@ -92,6 +102,8 @@ public:
     pub_theta2.publish(theta2_msg);
   }
 
+
+  /* Set Position & Speed */
   void setPosition(int id, int position)
   {
     dynamixel_workbench_msgs::DynamixelCommand srv;
@@ -117,8 +129,10 @@ public:
 private:
   ros::NodeHandle nh_;
   ros::ServiceClient client;
+  
   ros::Subscriber sub;
   ros::Subscriber sub_r;
+  
   ros::Publisher pub_theta1;
   ros::Publisher pub_theta2;
   ros::Publisher pub_r;
@@ -129,8 +143,8 @@ private:
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "jammer_unit_node");
-  DynamixelControl jammer_unit;
+  ros::init(argc, argv, "radar_unit_node");
+  DynamixelControl radar_unit;
   ros::spin();
   return 0;
 }
