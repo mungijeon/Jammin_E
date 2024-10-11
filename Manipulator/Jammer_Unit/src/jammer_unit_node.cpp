@@ -64,10 +64,12 @@ public:
   /* Callback Function */
   void Callback1(const std_msgs::Int32::ConstPtr& msg)
   {
+    ser.write("H");
     setPosition(3, msg->data);
   }
   void Callback2(const std_msgs::Int32::ConstPtr& msg)
   {
+    //ser.write("H");
     setPosition(4, msg->data);
   }
   
