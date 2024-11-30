@@ -16,9 +16,14 @@ public:
       sub theta2 : /position_2    from simulink
     *********************************************************************/
     client     = nh_.serviceClient<dynamixel_workbench_msgs::DynamixelCommand>("/dynamixel_workbench/dynamixel_command");
-    
-    sub_theta1 = nh_.subscribe("/position_1", 10, &DynamixelControl::Callback1, this);
-    sub_theta2 = nh_.subscribe("/position_2", 10, &DynamixelControl::Callback2, this);
+    sub_theta1 = nh_.subscribe("/position_1", 10, &DynamixelControl::Callback_theta1, this);
+    sub_theta2 = nh_.subscribe("/position_2", 10, &DynamixelControl::Callback_theta2, this);
+
+    sub_left   = nh_.subscribe("/motor_left", 10, &DynamixelControl::Callback_left, this);
+    sub_center = nh_.subscribe("/motor_center", 10, &DynamixelControl::Callback_center, this);
+    sub_right  = nh_.subscribe("/motor_right", 10, &DynamixelControl::Callback_right, this);
+
+    pub_dir    = nh_.advertise<std_msgs::Int32>("/radar_dir", 10);
     
     /*********************************************************************
       INIT VALUE
@@ -38,7 +43,6 @@ public:
     setPosition(3,1300); // 115
     setPosition(4,1600); // 140
     
-    /* Relay Module: Set Low voltage */
     try
     {
       ser.setPort("/dev/ttyACM0");
@@ -59,22 +63,95 @@ public:
       
     ser.write("L");
   }
-
-
-  /* Callback Function */
-  void Callback1(const std_msgs::Int32::ConstPtr& msg)
+  
+  
+  /* Jammer-On interrupt & Moving Jammer Antenna */
+  /* Need to setting */
+  
+  
+  /* Jammer Motor pos Callback Fnc */
+  void Callback_theta1(const std_msgs::Int32::ConstPtr& msg)
   {
+    ROS_INFO("theta3: %d",msg->data);
+    setPosition(3,msg->data); 
+  }
+  
+  void Callback_theta2(const std_msgs::Int32::ConstPtr& msg)
+  {
+    ROS_INFO("theta4: %d",msg->data);
+    setPosition(4,msg->data);
+  }
+  
+  void Callback_left(const std_msgs::Int32::ConstPtr& msg)
+  {
+    ros::Duration(5).sleep();
+
+    int R = 0;
+    std_msgs::Int32 r_msg;
+    r_msg.data = R;
+    pub_dir.publish(r_msg);
+
+    // signal processing delay
+    ros::Duration(1).sleep();
+
     ser.write("H");
-    setPosition(3, msg->data);
+
+    int theta3 = 1650; // 150
+    int theta4 = 1050; // 100
+
+	//ROS_INFO("theta3: %d, theta4: %d", theta3, theta4);
+	setPosition(3,theta3); 
+	setPosition(4,theta4);
   }
-  void Callback2(const std_msgs::Int32::ConstPtr& msg)
+
+  void Callback_center(const std_msgs::Int32::ConstPtr& msg)
   {
-    //ser.write("H");
-    setPosition(4, msg->data);
+    ros::Duration(5).sleep();
+
+    int R = 1;
+    std_msgs::Int32 r_msg;
+    r_msg.data = R;
+    pub_dir.publish(r_msg);
+
+    // signal processing delay
+    ros::Duration(1).sleep();
+    
+    ser.write("H");
+
+    int theta3 = 1300; // 115
+    int theta4 = 1050; // 100
+
+	//ROS_INFO("theta3: %d, theta4: %d", theta3, theta4);
+	setPosition(3,theta3); 
+	setPosition(4,theta4);
+  }
+
+  void Callback_right(const std_msgs::Int32::ConstPtr& msg)
+  {
+    ros::Duration(5).sleep();
+
+    int R = 2;
+    std_msgs::Int32 r_msg;
+    r_msg.data = R;
+    pub_dir.publish(r_msg);
+
+    // signal processing delay
+    ros::Duration(1).sleep();
+    
+    ser.write("H");
+
+    int theta3 = 950;  // 80
+    int theta4 = 1050; // 100
+    //int theta3 = 1150;
+    //int theta4 = 950;
+
+	//ROS_INFO("theta3: %d, theta4: %d", theta3, theta4);
+	setPosition(3,theta3); 
+	setPosition(4,theta4);
   }
   
-  
-  /* Set Position & Speed */
+
+  /* Set Position & Set Speed Fnc */
   void setPosition(int id, int position)
   {
     dynamixel_workbench_msgs::DynamixelCommand srv;
@@ -103,6 +180,11 @@ private:
   
   ros::Subscriber sub_theta1;
   ros::Subscriber sub_theta2;
+  ros::Subscriber sub_left;
+  ros::Subscriber sub_center;
+  ros::Subscriber sub_right;
+
+  ros::Publisher pub_dir;
   
   serial::Serial ser;
 };
